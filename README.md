@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Gemma 4 Starter
 
 Build with **Gemma 4** (model `gemma-4-26b-a4b-it`), an open model from Google, using a free key. This repo has two jobs:
@@ -67,3 +68,7 @@ Every line should say PASS. If not, see [docs/TROUBLESHOOTING.md](docs/TROUBLESH
 ## License
 
 MIT. See [LICENSE](LICENSE). Keep this file in your project.
+=======
+# Campus-Sathi-Ai-
+Campus Sathi Ai - 3D Walkthrough is a single-page web application designed to enhance the student experience at Kalinga University. Combining interactive 3D graphics with everyday student utilities, it serves as a virtual campus guide and student service portal
+>>>>>>> fae1912b056a55d0785ed534a7b4acabff50c8e1
