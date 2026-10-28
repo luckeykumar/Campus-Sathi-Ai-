@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Campus Helper - 3D Walkthrough</title>
+<style>
+:root{--g:#14573f;--g2:#0e3f2d;--cr:#fdf3e1;--cr2:#f3e6c8;--y:#f2c94c;--tx:#1d2b24;--mu:#5d6b63;--bg:#cfe3c0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--tx);font:14px/1.45 "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10261c}}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
+.card{background:var(--cr);border-radius:16px;box-shadow:0 8px 28px rgba(20,60,40,.25);color:var(--tx)}
+#cap{position:fixed;top:14px;left:50%;transform:translateX(-50%);padding:12px 26px;text-align:center;min-width:250px;max-width:92vw;transition:opacity .3s}
+#cap h1{margin:0;font:700 22px Georgia,serif;color:var(--g)}
+#cap p{margin:2px 0 0;color:var(--mu);font-size:13px}
+#skip{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);border:0;background:var(--cr);padding:8px 18px;border-radius:99px;cursor:pointer;font-weight:700;color:var(--g);box-shadow:0 4px 14px rgba(0,0,0,.18);transition:opacity .3s}
+#skip[hidden]{display:none}
+#nav{position:fixed;left:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;max-height:calc(100% - 110px);overflow:auto}
+#nav button{border:2px solid transparent;background:var(--cr);padding:5px 12px;border-radius:12px;cursor:pointer;font-weight:700;color:var(--g);text-align:left;box-shadow:0 3px 10px rgba(0,0,0,.15);transition:.2s}
+#nav button:hover{border-color:var(--y)}#nav button.on{background:var(--g);color:#fff}
+#bot{position:fixed;right:14px;bottom:14px;width:330px;padding:10px;z-index:3}#br{font-size:13px;color:var(--mu);max-height:64px;overflow:auto;margin-bottom:8px}#bot .row{display:flex;gap:6px}#bot input{flex:1;min-width:0;border:1px solid #d6c79f;border-radius:10px;padding:8px;background:#fff;font:inherit}#bot button{border:0;background:var(--g);color:#fff;border-radius:10px;width:38px;cursor:pointer}#bm.rec{background:#d64545}#bot button:disabled{opacity:.4}
+#tm{position:fixed;inset:0;z-index:20;background:rgba(5,25,15,.7);display:none;place-items:center}#tm.open{display:grid}#tm .win{width:min(1100px,94vw);height:min(720px,88vh);display:flex;flex-direction:column;overflow:hidden}#tm .bar{display:flex;gap:10px;align-items:center;padding:10px 14px}#tm .bar strong{flex:1;font:700 16px Georgia,serif;color:var(--g)}#tm iframe{flex:1;border:0;width:100%;background:#0b1d14}#tm a.btn{text-decoration:none;display:inline-block}.btn.s{background:var(--cr2);color:var(--g);margin-bottom:10px}.fx div{margin-top:4px;font-size:13px}.src{font-size:11px;color:var(--mu)}
+#v360{position:fixed;inset:0;width:100%;height:100%;border:0;z-index:1;display:none;background:#0b1d14}#v360.on{display:block}#n360{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:2;padding:8px 16px;display:none;font-size:13px;white-space:nowrap}#v360.on~#n360{display:block}#cap,#nav,#skip{z-index:2}#n360 a{color:var(--g);font-weight:700}
+button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--y);outline-offset:2px}
+#panel{position:fixed;right:14px;top:84px;bottom:140px;width:340px;z-index:4;padding:18px;overflow:auto;transform:translateX(120%);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+#panel.open{transform:none}
+#panel h2{margin:0 0 2px;font:700 22px Georgia,serif;color:var(--g)}
+#panel .sub{color:var(--mu);margin:0 0 12px}
+.box{background:var(--cr2);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.box b{display:block;color:var(--g)}
+.btn{border:0;background:var(--g);color:#fff;padding:9px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--g2)}.btn.y{background:var(--y);color:#3b2f00}
+select,textarea{width:100%;border:1px solid #d6c79f;border-radius:10px;padding:8px;background:#fff;font:inherit;margin:4px 0 8px}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--y);color:#3b2f00}
+.chip.a{background:#bfe3ff}.chip.p{background:#bfeccc}
+.x{float:right;border:0;background:none;font-size:20px;cursor:pointer;color:var(--mu)}
+#userBadge{position:fixed;top:14px;right:14px;z-index:10;display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:99px;cursor:pointer;font-weight:700;font-size:13px;border:2px solid transparent;background:var(--cr);color:var(--g);box-shadow:0 4px 14px rgba(0,0,0,.15);transition:.2s}
+#userBadge:hover{border-color:var(--y);background:#fff}
+#authModal{position:fixed;inset:0;z-index:100;background:rgba(8,28,18,.75);backdrop-filter:blur(5px);display:none;place-items:center;padding:16px}
+#authModal.open{display:grid}
+#authModal .win{width:min(520px,94vw);max-height:92vh;overflow-y:auto;padding:24px 22px;border-radius:18px;background:var(--cr);box-shadow:0 12px 36px rgba(0,0,0,.35)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-group{margin-bottom:10px}
+.form-group label{display:block;font-weight:700;font-size:12px;margin-bottom:3px;color:var(--g)}
+.form-group input,.form-group select{margin:0;width:100%;border:1px solid #d6c79f;border-radius:10px;padding:8px;background:#fff;font:inherit}
+.auth-header{text-align:center;margin-bottom:16px}
+.auth-header h2{margin:4px 0 2px;font:700 22px Georgia,serif;color:var(--g)}
+.auth-header p{margin:0;color:var(--mu);font-size:13px}
+.auth-actions{display:flex;gap:10px;margin-top:16px}
+.auth-actions button{flex:1}
+@media (max-width:760px){#nav{top:auto;bottom:100px;left:8px;right:8px;max-height:96px;overflow:auto;transform:none;flex-direction:row;flex-wrap:wrap;justify-content:center}#nav button{padding:6px 10px}
+#panel{top:auto;left:8px;right:8px;bottom:100px;width:auto;height:44%;transform:translateY(130%)}#bot{left:8px;right:8px;width:auto;bottom:8px}#skip{bottom:150px}#panel.open{transform:none}#cap h1{font-size:18px}
+#userBadge{top:12px;right:10px;padding:6px 12px;font-size:12px}
+.form-grid{grid-template-columns:1fr}}
+/* Admin Panel & Auth Styles */
+#adminAuthModal, #adminModal{position:fixed;inset:0;z-index:200;background:rgba(5,20,12,.85);backdrop-filter:blur(6px);display:none;place-items:center;padding:16px}
+#adminAuthModal.open, #adminModal.open{display:grid}
+#adminModal .win{width:min(1100px,96vw);height:min(780px,92vh);background:var(--cr);border-radius:18px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.admin-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:var(--g);color:#fff}
+.admin-bar h2{margin:0;font:700 20px Georgia,serif;display:flex;align-items:center;gap:8px}
+.admin-tabs{display:flex;gap:6px;padding:10px 18px;background:var(--cr2);border-bottom:1px solid #d6c79f;overflow-x:auto}
+.admin-tab{border:0;background:transparent;padding:7px 16px;border-radius:8px;font-weight:700;cursor:pointer;color:var(--g);transition:.2s;white-space:nowrap}
+.admin-tab:hover{background:rgba(20,87,63,.1)}
+.admin-tab.active{background:var(--g);color:#fff}
+.admin-body{flex:1;overflow-y:auto;padding:18px 20px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:18px}
+.stat-card{background:var(--cr2);border-radius:12px;padding:14px;border:1px solid #d6c79f}
+.stat-card small{color:var(--mu);font-size:12px;font-weight:700;text-transform:uppercase}
+.stat-card .val{font:700 28px Georgia,serif;color:var(--g);margin-top:4px}
+.adm-table-wrap{overflow-x:auto;background:#fff;border-radius:12px;border:1px solid #d6c79f;box-shadow:0 2px 8px rgba(0,0,0,.05);max-height:480px}
+.adm-table{width:100%;border-collapse:collapse;font-size:13px;text-align:left}
+.adm-table th{background:var(--g2);color:#fff;padding:10px 12px;font-weight:700;white-space:nowrap;position:sticky;top:0;z-index:2}
+.adm-table td{padding:10px 12px;border-bottom:1px solid #eee;vertical-align:middle}
+.adm-table tr:hover td{background:rgba(20,87,63,.04)}
+.adm-filters{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.adm-filters input, .adm-filters select{padding:6px 12px;border-radius:8px;border:1px solid #d6c79f;background:#fff;font-size:13px;width:auto;margin:0}
+.badge-status{display:inline-block;padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700}
+.status-sub{background:#bfe3ff;color:#0b3c65}
+.status-prog{background:#fff3bf;color:#664d03}
+.status-res{background:#bfeccc;color:#0f5132}
+.btn-sm{padding:4px 10px;font-size:11px;border-radius:6px;border:0;cursor:pointer;font-weight:700}
+#campusToast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--g2);color:#fff;padding:10px 22px;border-radius:99px;font-weight:700;font-size:13px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:transform .35s cubic-bezier(.175,.885,.32,1.275),opacity .35s;opacity:0;pointer-events:none;display:flex;align-items:center;gap:8px;border:1px solid var(--y)}
+#campusToast.show{transform:translateX(-50%) translateY(0);opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<canvas id="c"></canvas>
+<iframe id="v360" title="Kalinga University original 360 virtual tour" allow="fullscreen; xr-spatial-tracking; accelerometer; gyroscope; autoplay" allowfullscreen></iframe>
+<div id="n360" class="card">Original Kalinga 360&deg; tour. Blank? Try <button class="btn s" style="margin:0;padding:3px 10px" onclick="src360(1)">Source 1</button> <button class="btn s" style="margin:0;padding:3px 10px" onclick="src360(2)">Source 2</button> or <a href="https://virtualtour.kalingauniversity.ac.in/" target="_blank" rel="noopener">open in new tab</a></div>
+<div id="cap" class="card"><h1 id="t">Welcome to the campus</h1><p id="s">Walking to Reception...</p></div>
+<nav id="nav" aria-label="Destinations"></nav>
+<button id="skip">Skip animation &rsaquo;</button>
+<aside id="panel" class="card" aria-live="polite"></aside>
+<div id="bot" class="card"><div id="br"></div><div class="row"><button id="bm" aria-label="Speak">&#127908;</button><input id="bi" placeholder="Ask: mess kahan hai?" aria-label="Ask CampusBot"><button id="bs" aria-label="Send">&#10148;</button></div></div>
+<div id="tm" role="dialog" aria-modal="true" aria-label="Kalinga 360 tour"><div class="win card"><div class="bar"><strong>Kalinga University 360&deg; Virtual Tour</strong><a class="btn y" id="tnew" target="_blank" rel="noopener">Open in new tab</a><button class="btn" id="tx">Close</button></div><iframe id="tf" title="Kalinga University 360 virtual tour" allow="fullscreen; xr-spatial-tracking; accelerometer; gyroscope" allowfullscreen></iframe></div></div>
+<div id="userBadge" onclick="openAuth()" title="Student Profile / Login">&#128100; <span id="ubName">Student Login</span></div>
+<div id="authModal" role="dialog" aria-modal="true" aria-label="Student Campus Login">
+  <div class="win card">
+    <button class="x" aria-label="Close" onclick="closeAuth()">&times;</button>
+    <div class="auth-header">
+      <div style="font-size:32px">&#127891;</div>
+      <h2>Student Campus Login</h2>
+      <p>Enter your details for campus navigation & services</p>
+    </div>
+    <form id="authForm" onsubmit="saveUser(event); return false;">
+      <div class="form-group">
+        <label for="u_name">Full Name *</label>
+        <input id="u_name" required placeholder="e.g. Rahul Sharma">
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="u_email">Email Address *</label>
+          <input id="u_email" type="email" required placeholder="student@kalinga.edu">
+        </div>
+        <div class="form-group">
+          <label for="u_phone">Phone Number *</label>
+          <input id="u_phone" type="tel" required placeholder="10-digit mobile no." pattern="[0-9]{10}">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="u_dept">Department *</label>
+          <select id="u_dept" required>
+            <option value="">Select Department</option>
+            <option>Computer Science & IT</option>
+            <option>Civil / Mechanical / Electrical Engg</option>
+            <option>Commerce & Management</option>
+            <option>Pharmacy & Healthcare</option>
+            <option>Law & Legal Studies</option>
+            <option>Biotechnology & Life Sciences</option>
+            <option>Arts, Design & Media</option>
+            <option>Other Department</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="u_sem">Year / Semester *</label>
+          <select id="u_sem" required>
+            <option value="">Select Year / Sem</option>
+            <option>1st Year (Sem 1 / 2)</option>
+            <option>2nd Year (Sem 3 / 4)</option>
+            <option>3rd Year (Sem 5 / 6)</option>
+            <option>4th Year (Sem 7 / 8)</option>
+            <option>Post Graduate (PG / Ph.D)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="u_is_hosteller">Hostel Accommodation *</label>
+        <select id="u_is_hosteller" onchange="toggleHostelFields()">
+          <option value="no">No (Day Scholar)</option>
+          <option value="yes">Yes (Hostel Resident)</option>
+        </select>
+      </div>
+      <div id="hostelFields" class="form-grid" style="display:none">
+        <div class="form-group">
+          <label for="u_hostel">Hostel Name</label>
+          <select id="u_hostel">
+            <option value="Pacific Hostel">Pacific Boys Hostel</option>
+            <option value="Brahmaputra Hostel">Brahmaputra Boys Hostel</option>
+            <option value="Everest Hostel">Everest Boys Hostel</option>
+            <option value="Indus Hostel">Indus Girls Hostel</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="u_room">Hostel Room No.</label>
+          <input id="u_room" placeholder="e.g. B-204">
+        </div>
+      </div>
+      <div class="auth-actions">
+        <button type="button" class="btn y" style="font-weight:700" onclick="saveUser(event)">Save & Enter</button>
+        <button type="button" class="btn s" onclick="closeAuth()">Explore as Guest</button>
+      </div>
+      <div id="logoutSection" style="display:none;margin-top:14px;text-align:center">
+        <button type="button" class="btn" style="background:#d64545;padding:6px 14px;font-size:12px" onclick="logoutUser()">Log Out / Clear Details</button>
+      </div>
+    </form>
+  </div>
+</div>
+<!-- Admin Passcode Modal (Hidden from public) -->
+<div id="adminAuthModal" role="dialog" aria-modal="true" aria-label="Admin Authentication">
+  <div class="card" style="width:min(400px,92vw);padding:26px 22px;border-radius:18px;text-align:center">
+    <button class="x" aria-label="Close" onclick="closeAdminAuth()">&times;</button>
+    <div style="font-size:36px;margin-bottom:8px">&#128272;</div>
+    <h3 style="margin:0 0 6px;font:700 22px Georgia,serif;color:var(--g)">Administrator Access</h3>
+    <p style="color:var(--mu);font-size:12px;margin:0 0 16px">Confidential access to student registrations and campus complaints.</p>
+    <form onsubmit="verifyAdminPass(event); return false;">
+      <input id="adminPassInput" type="password" placeholder="Enter Admin Passcode" required style="text-align:center;font-size:16px;letter-spacing:2px;margin-bottom:8px">
+      <div id="adminAuthErr" style="color:#d64545;font-size:12px;display:none;margin-bottom:8px">Incorrect passcode. Try again.</div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button type="button" class="btn y" style="flex:1" onclick="verifyAdminPass(event)">Unlock Dashboard</button>
+        <button type="button" class="btn s" onclick="closeAdminAuth()">Cancel</button>
+      </div>
+    </form>
+    <div style="font-size:11px;color:var(--mu);margin-top:14px;background:var(--cr2);padding:6px;border-radius:8px">Default passcode: <b>admin123</b></div>
+  </div>
+</div>
+
+<!-- Admin Dashboard Modal -->
+<div id="adminModal" role="dialog" aria-modal="true" aria-label="Admin Dashboard">
+  <div class="win card">
+    <div class="admin-bar">
+      <h2>&#128737; Campus Admin Dashboard <span style="font-size:12px;font-weight:normal;opacity:.85">(Protected)</span></h2>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="btn s" style="margin:0;padding:5px 12px;font-size:12px" onclick="exportDataJSON()">Export JSON</button>
+        <button class="x" style="color:#fff;float:none" aria-label="Close" onclick="closeAdmin()">&times;</button>
+      </div>
+    </div>
+    <div class="admin-tabs">
+      <button id="tabBtn-overview" class="admin-tab active" onclick="switchAdminTab('overview')">&#128202; Overview</button>
+      <button id="tabBtn-students" class="admin-tab" onclick="switchAdminTab('students')">&#128101; Registered Students (<span id="admStudentsCount">0</span>)</button>
+      <button id="tabBtn-complaints" class="admin-tab" onclick="switchAdminTab('complaints')">&#128221; Complaints & Requests (<span id="admComplaintsCount">0</span>)</button>
+      <button id="tabBtn-data" class="admin-tab" onclick="switchAdminTab('data')">&#9881; Data & Export</button>
+    </div>
+    <div class="admin-body">
+      <!-- Overview Tab -->
+      <div id="tab-overview" class="tab-pane">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <small>Total Students</small>
+            <div class="val" id="stTotalStudents">0</div>
+          </div>
+          <div class="stat-card">
+            <small>Hostellers / Day Scholars</small>
+            <div class="val" id="stHostelVsDay">0 / 0</div>
+          </div>
+          <div class="stat-card">
+            <small>Total Complaints</small>
+            <div class="val" id="stTotalReqs">0</div>
+          </div>
+          <div class="stat-card">
+            <small>Pending / Resolved</small>
+            <div class="val" id="stPendingVsRes">0 / 0</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
+          <div>
+            <h4 style="margin:0 0 8px;color:var(--g)">Recent Students</h4>
+            <div id="admRecentStudents" class="adm-table-wrap"></div>
+          </div>
+          <div>
+            <h4 style="margin:0 0 8px;color:var(--g)">Recent Complaints</h4>
+            <div id="admRecentComplaints" class="adm-table-wrap"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Students Tab -->
+      <div id="tab-students" class="tab-pane" style="display:none">
+        <div class="adm-filters">
+          <input id="searchStudent" placeholder="Search by name, email, dept or room..." oninput="renderStudentsTable()" style="min-width:240px">
+          <select id="filterStudentResidence" onchange="renderStudentsTable()">
+            <option value="all">All Students</option>
+            <option value="hosteller">Hostel Residents</option>
+            <option value="day">Day Scholars</option>
+          </select>
+          <button class="btn s" style="margin:0;padding:6px 14px" onclick="exportStudentsCSV()">Download Students CSV</button>
+        </div>
+        <div id="studentsTableWrap" class="adm-table-wrap"></div>
+      </div>
+
+      <!-- Complaints Tab -->
+      <div id="tab-complaints" class="tab-pane" style="display:none">
+        <div class="adm-filters">
+          <input id="searchComplaint" placeholder="Search complaint details, student..." oninput="renderComplaintsTable()" style="min-width:220px">
+          <select id="filterComplaintStatus" onchange="renderComplaintsTable()">
+            <option value="all">All Statuses</option>
+            <option value="Submitted">Submitted</option>
+            <option value="Assigned">Assigned</option>
+            <option value="In progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+          <select id="filterComplaintLoc" onchange="renderComplaintsTable()">
+            <option value="all">All Locations</option>
+          </select>
+          <button class="btn s" style="margin:0;padding:6px 14px" onclick="exportComplaintsCSV()">Download Complaints CSV</button>
+        </div>
+        <div id="complaintsTableWrap" class="adm-table-wrap"></div>
+      </div>
+
+      <!-- Data Tab -->
+      <div id="tab-data" class="tab-pane" style="display:none">
+        <div class="box" style="margin-bottom:14px">
+          <b style="color:var(--g);font-size:15px">Export Records</b>
+          <p style="margin:4px 0 10px;color:var(--mu);font-size:13px">Download all registered students, tokens and complaints in CSV or JSON.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" onclick="exportStudentsCSV()">Download Students (.csv)</button>
+            <button class="btn" onclick="exportComplaintsCSV()">Download Complaints (.csv)</button>
+            <button class="btn y" onclick="exportDataJSON()">Download Full Database (.json)</button>
+          </div>
+        </div>
+        <div class="box" style="margin-bottom:14px">
+          <b style="color:var(--g);font-size:15px">Sample Demo Data</b>
+          <p style="margin:4px 0 10px;color:var(--mu);font-size:13px">Add demo students and complaints to test the administrative functions.</p>
+          <button class="btn s" onclick="seedSampleAdminData()">Insert 3 Sample Students & Complaints</button>
+        </div>
+        <div class="box" style="border:1px solid #d64545">
+          <b style="color:#d64545;font-size:15px">Danger Zone</b>
+          <p style="margin:4px 0 10px;color:var(--mu);font-size:13px">Clear all registered student data or complaints permanently.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" style="background:#d64545" onclick="clearAdminComplaints()">Clear All Complaints</button>
+            <button class="btn" style="background:#801b1b" onclick="clearAdminAll()">Reset Entire Database</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="campusToast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const CAFE=["Campus cafeterias serve fresh juices, snacks and ice creams at subsidised rates, open till late (about 7 cafeterias reported)","Canteen and Food Mess are also listed campus facilities"],
+ HOST=["Separate hostels for boys and for girls with boarding and recreation facilities","Separate fitness centres for hostel boys and girls","Fully Wi-Fi campus"];
+const SP={
+ reception:{n:"Reception",x:-9,z:10,look:[0,10],c:0x14573f,info:"Help desk, notices and general enquiries.",facts:["Kalinga University, Kotni, near Mantralaya, Naya Raipur 492101, Chhattisgarh","Established 2013 in the Smart City of New Raipur","Schools include Engineering, Law, Pharmacy, Design, IT, Biotechnology, Commerce & Management and more","Fully Wi-Fi campus with ATM, mini market and sports complex"],cats:["General enquiry","ID card","Fee query"],
+  notices:["Sample notice: Mid-semester timetable will be put up on the notice board.","Sample notice: Library cards must be renewed before the month end.","Sample notice: Cultural club auditions open this week."]},
+ library:{n:"Library",x:-7.4,z:-10.9,c:0x2f6fa8,fl:2,info:"About 80,000+ books plus digital access.",facts:["About 80,000+ books, with Indian and international journals and magazines","Digital content through DELNET, National Digital Library and NPTEL"],cats:["Book request","Seat issue","Other"]},
+ lab:{n:"Lab",x:-6.3,z:-21.1,c:0x7b4fa0,fl:2,info:"Equipment faults and lab slot booking.",facts:["Faculty of Research coordinates research facilities","Central Instrumentation Facility is on campus","Student reviews describe the labs and classrooms as spacious"],cats:["Equipment fault","Slot booking","Other"]},
+ canteen:{n:"Canteen",x:0,z:-13,c:0xd98a2b,info:"Meals, snacks, hygiene and menu feedback.",facts:["Canteen and Food Mess are both listed campus facilities","Student reviews praise the canteen meals","Cafeterias serve juices, snacks and ice creams at subsidised rates till late"],cats:["Food quality","Hygiene","Menu request","Other"]},
+ cafe1:{n:"Cafe 1",s:"Cafe 1",x:6.3,z:-21.1,c:0x8d5a3b,info:"Coffee, chai and quick bites.",facts:CAFE,cats:["Order query","Hygiene","Other"]},
+ cafe2:{n:"Cafe 2",s:"Cafe 2",x:7.4,z:-10.9,c:0xa0663a,info:"Coffee, chai and quick bites.",facts:CAFE,cats:["Order query","Hygiene","Other"]},
+ cafe3:{n:"Cafe 3",s:"Cafe 3",x:17.1,z:-14.4,c:0x6f4a2f,info:"Coffee, chai and quick bites.",facts:CAFE,cats:["Order query","Hygiene","Other"]},
+ barber:{n:"Barber Shop",s:"Barber",x:12.6,z:-5.1,c:0x7a2e2e,info:"Haircuts and grooming.",facts:["Mini market and student hangout areas are listed among campus facilities"],cats:["Appointment","Price query","Other"]},
+ boys1:{n:"Pacific Hostel",s:"Pacific",x:-22.6,z:-3,c:0x2f5f9a,fl:3,info:"Maintenance, room and Wi-Fi requests.",facts:HOST,cats:["Maintenance","Room change","Electricity / Wi-Fi","Other"]},
+ boys2:{n:"Brahmaputra Hostel",s:"Brahmaputra",x:-12.6,z:-5.1,c:0x3a74b8,fl:3,info:"Maintenance, room and Wi-Fi requests.",facts:HOST,cats:["Maintenance","Room change","Electricity / Wi-Fi","Other"]},
+ boys3:{n:"Everest Hostel",s:"Everest",x:-17.1,z:-14.4,c:0x254a7a,fl:3,info:"Maintenance, room and Wi-Fi requests.",facts:HOST,cats:["Maintenance","Room change","Electricity / Wi-Fi","Other"]},
+ girls:{n:"Indus Hostel",s:"Indus",x:22.6,z:-3,c:0xc4566b,fl:3,info:"Maintenance, room and Wi-Fi requests.",facts:HOST,cats:["Maintenance","Room change","Electricity / Wi-Fi","Other"]}
+};
+const HUB=new THREE.Vector3(0,0,1);
+/* toast notification */
+window.toast = function(msg, duration = 3000){
+ const el = $("#campusToast");
+ if(!el) return;
+ el.textContent = msg;
+ el.classList.add("show");
+ clearTimeout(el._timer);
+ el._timer = setTimeout(() => el.classList.remove("show"), duration);
+};
+
+/* Industrial Persistent Storage Engine (IndexedDB + Multi-Key LocalStorage Backup) */
+const CampusDB = {
+ dbName: "KalingaCampusDB",
+ dbVersion: 1,
+ _idb: null,
+ data: { user: null, users: [], reqs: [], tok: {} },
+ init: function(cb){
+  this.loadStorage();
+  if(navigator.storage && navigator.storage.persist){
+   navigator.storage.persist().catch(()=>{});
+  }
+  if(window.indexedDB){
+   const req = indexedDB.open(this.dbName, this.dbVersion);
+   req.onupgradeneeded = e => {
+    const db = e.target.result;
+    if(!db.objectStoreNames.contains("students")) db.createObjectStore("students", { keyPath: "email" });
+    if(!db.objectStoreNames.contains("complaints")) db.createObjectStore("complaints", { keyPath: "id" });
+    if(!db.objectStoreNames.contains("state")) db.createObjectStore("state", { keyPath: "key" });
+   };
+   req.onsuccess = e => {
+    this._idb = e.target.result;
+    this.loadIDB(cb);
+   };
+   req.onerror = () => { if(cb) cb(); };
+  } else {
+   if(cb) cb();
+  }
+ },
+ loadStorage: function(){
+  try{
+   const main = JSON.parse(localStorage.getItem("campus_db_v2") || localStorage.getItem("campus_db") || "{}");
+   const usersList = JSON.parse(localStorage.getItem("campus_students_registry") || "[]");
+   const reqsList = JSON.parse(localStorage.getItem("campus_complaints_registry") || "[]");
+   const activeUser = JSON.parse(localStorage.getItem("campus_active_user") || "null");
+   const backup = JSON.parse(localStorage.getItem("campus_backup_db") || "{}");
+
+   this.data.user = activeUser || main.user || backup.user || null;
+   const uMap = new Map();
+   (usersList||[]).forEach(u=>{if(u&&u.email) uMap.set(u.email.toLowerCase(), u);});
+   (main.users||[]).forEach(u=>{if(u&&u.email&&!uMap.has(u.email.toLowerCase())) uMap.set(u.email.toLowerCase(), u);});
+   (backup.users||[]).forEach(u=>{if(u&&u.email&&!uMap.has(u.email.toLowerCase())) uMap.set(u.email.toLowerCase(), u);});
+   if(this.data.user && this.data.user.email) uMap.set(this.data.user.email.toLowerCase(), this.data.user);
+   this.data.users = Array.from(uMap.values());
+
+   const rMap = new Map();
+   (reqsList||[]).forEach(r=>{if(r&&r.id) rMap.set(r.id, r);});
+   (main.reqs||[]).forEach(r=>{if(r&&r.id&&!rMap.has(r.id)) rMap.set(r.id, r);});
+   (backup.reqs||[]).forEach(r=>{if(r&&r.id&&!rMap.has(r.id)) rMap.set(r.id, r);});
+   this.data.reqs = Array.from(rMap.values()).sort((a,b)=>b.id-a.id);
+   this.data.tok = main.tok || backup.tok || {};
+  }catch(e){console.warn("Storage load:", e);}
+ },
+ loadIDB: function(cb){
+  if(!this._idb){if(cb) cb(); return;}
+  try{
+   const tx = this._idb.transaction(["students","complaints","state"], "readonly");
+   const st = tx.objectStore("students").getAll();
+   const cp = tx.objectStore("complaints").getAll();
+   const us = tx.objectStore("state").get("currentUser");
+   tx.oncomplete = () => {
+    let changed = false;
+    if(st.result && st.result.length){
+     const uMap = new Map(this.data.users.map(u=>[u.email.toLowerCase(), u]));
+     st.result.forEach(u=>{
+      if(u && u.email && !uMap.has(u.email.toLowerCase())){
+       uMap.set(u.email.toLowerCase(), u);
+       changed = true;
+      }
+     });
+     this.data.users = Array.from(uMap.values());
+    }
+    if(cp.result && cp.result.length){
+     const rMap = new Map(this.data.reqs.map(r=>[r.id, r]));
+     cp.result.forEach(r=>{
+      if(r && r.id && !rMap.has(r.id)){
+       rMap.set(r.id, r);
+       changed = true;
+      }
+     });
+     this.data.reqs = Array.from(rMap.values()).sort((a,b)=>b.id-a.id);
+    }
+    if(us.result && us.result.val && !this.data.user){
+     this.data.user = us.result.val;
+     changed = true;
+    }
+    if(changed){
+     this.syncStorage();
+     if(typeof updateUIForUser === "function") updateUIForUser();
+    }
+    if(cb) cb();
+   };
+  }catch(e){if(cb) cb();}
+ },
+ save: function(){
+  this.syncStorage();
+  this.syncIDB();
+ },
+ syncStorage: function(){
+  try{
+   const payload = JSON.stringify({
+    user: this.data.user,
+    users: this.data.users,
+    reqs: this.data.reqs,
+    tok: this.data.tok,
+    t: Date.now()
+   });
+   localStorage.setItem("campus_db_v2", payload);
+   localStorage.setItem("campus_backup_db", payload);
+   localStorage.setItem("campus_db", payload);
+   localStorage.setItem("campus_students_registry", JSON.stringify(this.data.users));
+   localStorage.setItem("campus_complaints_registry", JSON.stringify(this.data.reqs));
+   if(this.data.user){
+    localStorage.setItem("campus_active_user", JSON.stringify(this.data.user));
+   }else{
+    localStorage.removeItem("campus_active_user");
+   }
+  }catch(e){console.warn("Storage sync:", e);}
+ },
+ syncIDB: function(){
+  if(!this._idb) return;
+  try{
+   const tx = this._idb.transaction(["students","complaints","state"], "readwrite");
+   const st = tx.objectStore("students");
+   const cp = tx.objectStore("complaints");
+   const ss = tx.objectStore("state");
+   (this.data.users||[]).forEach(u=>{if(u&&u.email) st.put(u);});
+   (this.data.reqs||[]).forEach(r=>{if(r&&r.id) cp.put(r);});
+   if(this.data.user){
+    ss.put({key:"currentUser", val:this.data.user});
+   }else{
+    ss.delete("currentUser");
+   }
+  }catch(e){console.warn("IDB sync:", e);}
+ }
+};
+CampusDB.init();
+const DB = CampusDB.data;
+const save = () => CampusDB.save();
+/* scene */
+const cv=$("#c"),R=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+R.setPixelRatio(Math.min(devicePixelRatio||1,2));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+const sc=new THREE.Scene();sc.background=new THREE.Color(0xcfe3c0);
+const cam=new THREE.OrthographicCamera(-1,1,1,-1,.1,100);cam.position.set(14,13,9);cam.lookAt(0,0,-5);
+sc.add(new THREE.HemisphereLight(0xeaf6ff,0x9ccf8a,.85));sc.fog=new THREE.Fog(0xcfe3c0,70,140);const dl=new THREE.DirectionalLight(0xfff2d8,.7);dl.position.set(12,24,10);sc.add(dl);dl.castShadow=true;dl.shadow.mapSize.set(2048,2048);Object.assign(dl.shadow.camera,{left:-45,right:45,top:45,bottom:-45,near:1,far:120});dl.shadow.camera.updateProjectionMatrix();
+const L=(c,o)=>new THREE.MeshLambertMaterial(Object.assign({color:c},o||{}));
+const Bx=(w,h,d,c)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d),L(c));
+function resize(){const w=innerWidth,h=innerHeight,a=w/h,d=Math.max(22,36/a);
+ R.setSize(w,h,false);cam.left=-a*d;cam.right=a*d;cam.top=d;cam.bottom=-d;cam.updateProjectionMatrix()}
+addEventListener("resize",resize);resize();
+function sprite(t,bg,fg,w){const c=document.createElement("canvas");c.width=256;c.height=96;const x=c.getContext("2d");
+ x.fillStyle=bg;x.beginPath();x.moveTo(20,6);x.arcTo(246,6,246,70,40);x.arcTo(246,70,10,70,40);x.arcTo(10,70,10,6,40);x.arcTo(10,6,246,6,40);x.fill();
+ x.beginPath();x.moveTo(118,70);x.lineTo(128,88);x.lineTo(138,70);x.fill();
+ x.fillStyle=fg;x.font="bold 36px Trebuchet MS,sans-serif";x.textAlign="center";x.fillText(t,128,52);
+ const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthTest:false}));s.scale.set(w,w*.375,1);s.renderOrder=9;return s}
+/* ground + paths */
+const lawn=Bx(58,.2,50,0xa9d18e);lawn.position.set(0,-.1,-5);lawn.receiveShadow=true;sc.add(lawn);
+const hub=new THREE.Mesh(new THREE.CylinderGeometry(3.6,3.6,.06,40),L(0xf3e6c8));hub.position.set(0,.03,1);sc.add(hub);
+function approach(k){const p=SP[k],v=new THREE.Vector3(p.x,0,p.z).sub(p.look?new THREE.Vector3(p.look[0],0,p.look[1]):HUB).normalize();return new THREE.Vector3(p.x,0,p.z).addScaledVector(v,-3.8)}
+const clickable=[],bl=[],lv=[];
+Object.keys(SP).forEach(k=>{const p=SP[k],a=approach(k);
+ const O=p.look?new THREE.Vector3(p.look[0],0,p.look[1]):HUB,len=a.distanceTo(O),pth=Bx(1.6,.05,len,0xf3e6c8);pth.position.set((a.x+O.x)/2,.03,(a.z+O.z)/2);pth.rotation.y=Math.atan2(a.x-O.x,a.z-O.z);sc.add(pth);
+ const g=new THREE.Group();g.position.set(p.x,0,p.z);const T=p.look||[HUB.x,HUB.z];g.rotation.y=Math.atan2(T[0]-p.x,T[1]-p.z);g.scale.setScalar(.001);g.userData.d=.4+bl.length*.15;bl.push(g);
+ const fl=p.fl||1,base=Bx(3.2,2.2*fl,3.2,0xfdf3e1);base.position.y=1.1*fl;const roof=Bx(3.6,.35,3.6,p.c);roof.position.y=2.2*fl+.2;
+ const door=Bx(.8,1.2,.1,0x7a5a36);door.position.set(0,.6,1.62);
+ for(let f=0;f<fl;f++)[-1,1].forEach(s=>{const w=Bx(.6,.6,.1,0xbfe3ff);w.position.set(s*1,1.4+2.2*f,1.62);g.add(w)});
+ g.add(base,roof,door);g.traverse(m=>{if(m.isMesh){m.userData.k=k;m.castShadow=true}});sc.add(g);clickable.push(base,roof);
+ const sg=sprite(p.s||p.n,"#14573f","#ffffff",5.2);sg.position.set(p.x,5.6+(fl-1)*3.5,p.z);sg.visible=false;g.userData.sg=sg;sc.add(sg)});
+[[-27,12],[27,12],[-27,-22],[27,-22],[-17,12],[9,12],[14,12],[-26,5],[26,5],[-14,-26],[14,-26],[0,-26],[-8,3],[8,5],[-22,-24],[22,-24]].forEach(([x,z])=>{
+ const t=new THREE.Mesh(new THREE.CylinderGeometry(.12,.15,.9),L(0x7a5a36));t.position.set(x,.45,z);
+ const l=new THREE.Mesh(new THREE.SphereGeometry(.7,10,8),L(0x3f9a5a));l.position.set(x,1.3,z);l.castShadow=true;l.userData.p=x+z;lv.push(l);sc.add(t,l)});
+/* main road, gate and boundary wall */
+const road=Bx(3,.05,17,0xf3e6c8);road.position.set(0,.03,9.5);sc.add(road);
+[-3.4,3.4].forEach(x=>{const pl=Bx(1.3,5,1.3,0xfdf3e1);pl.position.set(x,2.5,17);pl.castShadow=true;const cp=Bx(1.7,.4,1.7,0x14573f);cp.position.set(x,5.2,17);sc.add(pl,cp)});
+const arch=Bx(8.6,1,1.4,0x14573f);arch.position.set(0,5.5,17);arch.castShadow=true;sc.add(arch);
+const gs=sprite("Main Gate","#f2c94c","#14573f",6);gs.position.set(0,7.6,17);sc.add(gs);
+[-1,1].forEach(s=>{const w=Bx(24,1.5,.5,0xe9dcc0);w.position.set(s*16,.75,17);w.castShadow=true;sc.add(w)});
+/* character */
+const me=new THREE.Group(),body=new THREE.Mesh(new THREE.CylinderGeometry(.3,.32,.7,12),L(0x1e3a5f));body.position.y=.9;
+const head=new THREE.Mesh(new THREE.SphereGeometry(.24,14,12),L(0xf1c9a0));head.position.y=1.45;
+const hair=new THREE.Mesh(new THREE.SphereGeometry(.26,14,8,0,Math.PI*2,0,Math.PI/2),L(0x2b2b2b));hair.position.y=1.5;
+const lg=[-.14,.14].map(x=>{const l=Bx(.2,.55,.22,0x2d2d3a);l.geometry.translate(0,-.27,0);l.position.set(x,.55,0);me.add(l);return l});
+const ar=[-.4,.4].map(x=>{const a=Bx(.14,.5,.16,0x1e3a5f);a.geometry.translate(0,-.22,0);a.position.set(x,1.2,0);me.add(a);return a});me.add(body,head,hair);const you=sprite("YOU","#14573f","#ffffff",1.2);you.position.y=2.4;me.add(you);
+me.position.set(0,0,19.5);me.scale.setScalar(1.8);sc.add(me);me.traverse(m=>{if(m.isMesh)m.castShadow=true});
+const ring=new THREE.Mesh(new THREE.RingGeometry(.5,.72,32),new THREE.MeshBasicMaterial({color:0xf2c94c,side:THREE.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.visible=false;sc.add(ring);
+/* life: lamps, cloud shadows, students */
+for(let z=4;z<=16;z+=4)[-2.4,2.4].forEach(x=>{const pl=new THREE.Mesh(new THREE.CylinderGeometry(.06,.08,2.2),L(0x5d6b63));pl.position.set(x,1.1,z);const lm=new THREE.Mesh(new THREE.SphereGeometry(.22,10,8),new THREE.MeshBasicMaterial({color:0xfff2b0}));lm.position.set(x,2.3,z);sc.add(pl,lm)});
+const cs=[];for(let i=0;i<5;i++){const m=new THREE.Mesh(new THREE.CircleGeometry(4+i%3*1.5,24),new THREE.MeshBasicMaterial({color:0x1f4a30,transparent:true,opacity:.1,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.set(-30+i*14,.07,-18+i*7);m.scale.set(1.8,1,1);sc.add(m);cs.push(m)}
+const npc=[],ks=Object.keys(SP).filter(k=>k!=="reception");
+for(let i=0;i<9;i++){const g=new THREE.Group(),c=[0xe07a5f,0x3d7ea6,0x81b29a,0xf2cc8f,0x9b5de5][i%5];
+ const b=new THREE.Mesh(new THREE.CylinderGeometry(.26,.28,.6,10),L(c));b.position.y=.8;b.castShadow=true;
+ const h=new THREE.Mesh(new THREE.SphereGeometry(.2,12,10),L(0xf1c9a0));h.position.y=1.3;
+ const l1=Bx(.16,.5,.18,0x2d2d3a),l2=Bx(.16,.5,.18,0x2d2d3a);[l1,l2].forEach((l,j)=>{l.geometry.translate(0,-.25,0);l.position.set(j?.12:-.12,.5,0);g.add(l)});
+ g.add(b,h);g.scale.setScalar(1.5);g.position.set((Math.random()-.5)*5,0,1+(Math.random()-.5)*5);sc.add(g);npc.push({g,l:[l1,l2],q:[],ph:Math.random()*6,wait:0})}
+/* movement */
+let path=[],cur=null,phase=0,spd=0,arriveT=0,zv=.75,fx=0,fz=-5;
+function say(t,s){$("#t").textContent=t;$("#s").textContent=s}
+function walk(k){if(v360)setView(false);if(cur===k&&!path.length){open(k);return}
+ closeP();cur=k;path=me.position.z>12&&k==="reception"?[new THREE.Vector3(0,0,10),approach(k)]:[HUB.clone(),approach(k)];
+ if(me.position.distanceTo(HUB)<.5)path.shift();
+ say(k==="reception"&&!window._intro?"Welcome to the campus":"On the way","Walking to "+SP[k].n+"...");
+ $("#skip").hidden=false;mark(k);ring.position.copy(approach(k));ring.position.y=.08;ring.visible=true}
+$("#skip").onclick=()=>{if(!path.length)return;const e=path[path.length-1];me.position.copy(e);path=[];arrived()};
+function arrived(){arriveT=1.8;$("#skip").hidden=true;window._intro=1;say(SP[cur].n,SP[cur].info);open(cur)}
+const clock=new THREE.Clock();
+function tick(){requestAnimationFrame(tick);const dt=Math.min(clock.getDelta(),.05);
+ if(path.length){const p=path[0],d=p.clone().sub(me.position);d.y=0;const dist=d.length();
+  if(dist<.08){path.shift();if(!path.length)arrived()}
+  else{d.normalize();spd+=((dist>2?1:Math.max(.25,dist/2))*8-spd)*Math.min(1,dt*6);me.position.addScaledVector(d,Math.min(spd*dt,dist));
+   let df=Math.atan2(d.x,d.z)-me.rotation.y;df=Math.atan2(Math.sin(df),Math.cos(df));me.rotation.y+=df*Math.min(1,dt*12);
+   phase+=dt*(4+spd*.9);arriveT=0;ar[1].rotation.z=0;body.rotation.x=.16*spd/8;lg[0].rotation.x=Math.sin(phase)*.7;lg[1].rotation.x=-Math.sin(phase)*.7;ar[0].rotation.x=-Math.sin(phase)*.6;ar[1].rotation.x=Math.sin(phase)*.6;me.position.y=Math.abs(Math.sin(phase))*.06}}
+ else{lg[0].rotation.x=lg[1].rotation.x=ar[0].rotation.x=ar[1].rotation.x=0;spd=0;body.rotation.x=0;me.position.y=Math.sin(clock.elapsedTime*2)*.02;if(arriveT>0){arriveT-=dt;ar[1].rotation.z=-2.5+Math.sin(clock.elapsedTime*12)*.3}else ar[1].rotation.z=0}
+ const t=clock.elapsedTime;
+ bl.forEach(g=>{const s=Math.min(1,Math.max(0,(t-g.userData.d)/.8)),e=1+2.70158*Math.pow(s-1,3)+1.70158*Math.pow(s-1,2);g.scale.setScalar(Math.max(.001,e*1.6));if(s>.9)g.userData.sg.visible=true});
+ lv.forEach(l=>{const p=l.userData.p;l.scale.set(1+Math.sin(t*1.6+p)*.05,1,1+Math.cos(t*1.3+p)*.05)});
+ cs.forEach(m=>{m.position.x+=dt*.9;if(m.position.x>34)m.position.x=-34});
+ npc.forEach(n=>{if(n.wait>0){n.wait-=dt;n.l[0].rotation.x=n.l[1].rotation.x=0;return}
+  if(!n.q.length){const k=ks[Math.floor(Math.random()*ks.length)],j=()=>(Math.random()-.5)*1.4;n.q=[HUB.clone().add(new THREE.Vector3(j(),0,j())),approach(k).add(new THREE.Vector3(j(),0,j()))]}
+  const p=n.q[0],dx=p.x-n.g.position.x,dz=p.z-n.g.position.z,d=Math.hypot(dx,dz);
+  if(d<.2){n.q.shift();if(!n.q.length)n.wait=1+Math.random()*3;return}
+  n.g.position.x+=dx/d*2.4*dt;n.g.position.z+=dz/d*2.4*dt;n.g.rotation.y=Math.atan2(dx,dz);n.ph+=dt*8;n.l[0].rotation.x=Math.sin(n.ph)*.6;n.l[1].rotation.x=-Math.sin(n.ph)*.6});
+ zv*=1-Math.min(1,dt*1.1);const w=.15+zv*.85;
+ fx+=(me.position.x*w-fx)*Math.min(1,dt*3);fz+=(-5+(me.position.z+5)*w-fz)*Math.min(1,dt*3);
+ cam.position.set(fx+14,13,fz+14);cam.lookAt(fx,0,fz);cam.zoom=1+zv;cam.updateProjectionMatrix();
+ ring.scale.setScalar(1+Math.sin(t*4)*.12);R.render(sc,cam)}
+/* nav + click */
+const nav=$("#nav");Object.keys(SP).forEach(k=>{const b=document.createElement("button");b.textContent=SP[k].n;b.dataset.k=k;b.onclick=()=>walk(k);nav.appendChild(b)});
+const tb=document.createElement("button");tb.textContent="360\u00b0 Real Tour";tb.style.background="var(--y)";tb.onclick=()=>tour();nav.prepend(tb);
+function mark(k){nav.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.k===k))}
+const ray=new THREE.Raycaster(),mp=new THREE.Vector2();
+cv.addEventListener("pointerdown",e=>{mp.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(mp,cam);
+ const h=ray.intersectObjects(clickable,false)[0];if(h)walk(h.object.userData.k)});
+let hov=null;
+cv.addEventListener("pointermove",e=>{mp.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(mp,cam);const h=ray.intersectObjects(clickable,false)[0],o=h?h.object:null;if(o!==hov){if(hov)hov.material.emissive.setHex(0);if(o)o.material.emissive.setHex(0x2a2a2a);hov=o;cv.style.cursor=o?"pointer":"default"}});
+/* service panel */
+const P=$("#panel");function closeP(){P.classList.remove("open")}
+setInterval(()=>{Object.keys(DB.tok).forEach(k=>{const t=DB.tok[k];if(t.serving<t.next-1){t.serving++}});save();if(cur&&P.classList.contains("open"))qbox()},6000);
+function qbox(){const k=cur,t=DB.tok[k],q=$("#q");if(!q)return;
+ q.innerHTML=t&&t.mine?`<b>Your token #${t.mine}</b>${t.mine<=t.serving?"It is your turn. Please go to the counter.":(t.mine-t.serving)+" ahead of you (demo queue)"}`:`<b>Queue</b>Skip the line: take a token and we will tell you when it is your turn.`}
+function open(k){const p=SP[k];
+ let h=`<button class="x" aria-label="Close" onclick="closeP()">&times;</button><h2>${p.n}</h2><p class="sub">${p.info}</p>`;
+ if(p.facts)h+=`<div class="box fx"><b>From the university</b>${p.facts.map(f=>"<div>&bull; "+f+"</div>").join("")}<div class="src">Sources: university brochures and Careers360. Confirm details with the university.</div></div>`;
+ h+=`<button class="btn s" onclick="tour()">View real 360&deg; tour</button>`;
+ if(p.notices)h+=`<div class="box"><b>Notice board</b>${p.notices.map(n=>`<div style="margin-top:6px">${n}</div>`).join("")}</div>`;
+ h+=`<div class="box" id="q"></div><button class="btn y" onclick="token('${k}')">Get queue token</button>
+ <div class="box" style="margin-top:12px"><b>Raise a request or complaint</b><label for="cat">Category</label>
+ <select id="cat">${p.cats.map(c=>`<option>${c}</option>`).join("")}</select>
+ <label for="msg">Details</label><textarea id="msg" rows="3" placeholder="What happened? Add room, table or machine number."></textarea>
+ <button class="btn" onclick="submitReq('${k}')">Submit</button></div>
+ <b style="color:var(--g)">My requests here</b><div id="rl"></div>`;
+ P.innerHTML=h;P.classList.add("open");qbox();rl()}
+window.closeP=closeP;
+window.token=k=>{const t=DB.tok[k]||(DB.tok[k]={next:1,serving:0,mine:0});if(!t.mine||t.mine<=t.serving){t.mine=t.next+Math.floor(Math.random()*5);t.next=t.mine+1;if(t.serving<t.mine-4)t.serving=t.mine-4}save();qbox()};
+window.submitReq=k=>{
+ const msgEl = $("#msg");
+ const m = msgEl ? msgEl.value.trim() : "";
+ if(!m){ if(msgEl) msgEl.focus(); return false; }
+ const u=DB.user;
+ const by=u?`${u.name} (${u.dept?u.dept.split(' ')[0]:''}${u.isHosteller&&u.room?', Rm:'+u.room:''})`:"Guest Student";
+ const locName=SP[k]?SP[k].n:k;
+ const reqId=Date.now();
+ const r={
+  id:reqId,
+  k,
+  location:locName,
+  cat:$("#cat")?$("#cat").value:"General",
+  m,
+  s:"Submitted",
+  by,
+  userName:u?u.name:"Guest Student",
+  phone:u?u.phone:"",
+  email:u?u.email:"",
+  dept:u?u.dept:"",
+  sem:u?u.sem:"",
+  room:u&&u.isHosteller?`${u.hostel} (Rm: ${u.room})`:(u?"Day Scholar":"N/A"),
+  time:new Date().toLocaleString()
+ };
+ if(!DB.reqs) DB.reqs=[];
+ DB.reqs.unshift(r);
+ save();
+ if(msgEl) msgEl.value="";
+ rl();
+ toast(`✅ Complaint #${reqId.toString().slice(-4)} permanently saved in database!`);
+ setTimeout(()=>step(r.id,"Assigned"),4000);
+ setTimeout(()=>step(r.id,"In progress"),11000);
+ return false;
+};
+function step(id,s){const r=DB.reqs.find(x=>x.id===id);if(r){r.s=s;save();if(P.classList.contains("open"))rl()}}
+function rl(){const l=$("#rl");if(!l)return;const a=DB.reqs.filter(r=>r.k===cur);
+ l.innerHTML=a.length?a.map(r=>`<div class="box"><span class="chip ${r.s==="Assigned"?"a":r.s==="In progress"?"p":""}">${r.s}</span> <b style="display:inline">${r.cat}</b>${r.by?`<span class="src" style="margin-left:6px">&#128100; ${r.by}</span>`:""}<div>${r.m.replace(/[<>&]/g,"")}</div></div>`).join(""):`<div class="sub">Nothing yet.</div>`}
+/* user authentication & profile */
+window.openAuth=function(){
+ const u=DB.user;
+ if(u){
+  $("#u_name").value=u.name||"";
+  $("#u_email").value=u.email||"";
+  $("#u_phone").value=u.phone||"";
+  $("#u_dept").value=u.dept||"";
+  $("#u_sem").value=u.sem||"";
+  $("#u_is_hosteller").value=u.isHosteller?"yes":"no";
+  $("#u_hostel").value=u.hostel||"Pacific Hostel";
+  $("#u_room").value=u.room||"";
+  $("#logoutSection").style.display="block";
+ }else{
+  $("#authForm").reset();
+  $("#logoutSection").style.display="none";
+ }
+ window.toggleHostelFields();
+ $("#authModal").classList.add("open");
+};
+window.closeAuth=function(){$("#authModal").classList.remove("open")};
+window.toggleHostelFields=function(){
+ const isH=$("#u_is_hosteller").value==="yes";
+ $("#hostelFields").style.display=isH?"grid":"none";
+};
+window.saveUser=function(e){
+ if(e && e.preventDefault) e.preventDefault();
+ if(e && e.stopPropagation) e.stopPropagation();
+ const name = ($("#u_name")?.value || "").trim();
+ const email = ($("#u_email")?.value || "").trim();
+ const phone = ($("#u_phone")?.value || "").trim();
+ const dept = $("#u_dept")?.value || "";
+ const sem = $("#u_sem")?.value || "";
+ if(!name || !email || !dept || !sem){
+  alert("Please fill in Name, Email, Department and Year/Sem.");
+  return false;
+ }
+ const isH=$("#u_is_hosteller")?.value==="yes";
+ const u={
+  id:"std_"+Date.now(),
+  name:name,
+  email:email,
+  phone:phone,
+  dept:dept,
+  sem:sem,
+  isHosteller:isH,
+  hostel:isH?($("#u_hostel")?.value||""):"",
+  room:isH?($("#u_room")?.value||"").trim():"",
+  registeredAt:new Date().toLocaleString()
+ };
+ DB.user=u;
+ if(!DB.users) DB.users=[];
+ const idx = DB.users.findIndex(x=>(x.email&&x.email.toLowerCase()===u.email.toLowerCase()) || (u.phone&&x.phone===u.phone));
+ if(idx>=0){
+  DB.users[idx]=Object.assign({}, DB.users[idx], u);
+ }else{
+  DB.users.unshift(u);
+ }
+ save();
+ updateUIForUser();
+ closeAuth();
+ toast("✅ Student profile permanently saved in database!");
+ reply("Namaste "+u.name+"! Welcome to Kalinga Campus. Aapka data database mein permanently save ho gaya hai.");
+ return false;
+};
+window.logoutUser=function(){
+ if(!confirm("Are you sure you want to log out from this session? Your record remains permanently in the database.")) return;
+ DB.user=null;
+ save();
+ updateUIForUser();
+ closeAuth();
+ toast("Logged out from active session.");
+ reply("Aap successfully log out ho gaye hain. Student record database mein safe hai.");
+};
+function updateUIForUser(){
+ const u=DB.user;
+ if(u&&u.name){
+  $("#ubName").textContent=u.name+(u.dept?" ("+u.dept.split(" ")[0]+")":"");
+  $("#userBadge").title=u.name+" - "+u.dept+" - "+u.sem+(u.isHosteller?" ("+u.hostel+" Rm "+u.room+")":" (Day Scholar)");
+  $("#br").textContent="Namaste "+u.name+"! Type karo ya mic dabao, jaise: canteen kahan hai?";
+ }else{
+  $("#ubName").textContent="Student Login";
+  $("#userBadge").title="Click to log in / register";
+  $("#br").textContent="Namaste! Main CampusBot hoon. Type karo ya mic dabao, jaise: canteen ya hostel?";
+ }
+}
+/* Admin Panel Logic (Protected via Shortcut Key) */
+window._adminLoggedIn = false;
+window.triggerAdminAccess = function(){
+ if(window._adminLoggedIn){
+  openAdmin();
+ }else{
+  $("#adminPassInput").value = "";
+  $("#adminAuthErr").style.display = "none";
+  $("#adminAuthModal").classList.add("open");
+  setTimeout(()=>$("#adminPassInput").focus(), 120);
+ }
+};
+window.closeAdminAuth = function(){
+ $("#adminAuthModal").classList.remove("open");
+};
+window.verifyAdminPass = function(e){
+ e.preventDefault();
+ const val = $("#adminPassInput").value.trim();
+ if(val === "admin123" || val === "admin" || val === "kalinga2026"){
+  window._adminLoggedIn = true;
+  closeAdminAuth();
+  openAdmin();
+ }else{
+  $("#adminAuthErr").style.display = "block";
+  $("#adminPassInput").focus();
+ }
+};
+window.closeAdmin = function(){
+ $("#adminModal").classList.remove("open");
+};
+window.switchAdminTab = function(tabName){
+ document.querySelectorAll(".tab-pane").forEach(el => el.style.display = "none");
+ document.querySelectorAll(".admin-tab").forEach(el => el.classList.remove("active"));
+ const targetPane = $(`#tab-${tabName}`);
+ const targetBtn = $(`#tabBtn-${tabName}`);
+ if(targetPane) targetPane.style.display = "block";
+ if(targetBtn) targetBtn.classList.add("active");
+ renderAdminTab(tabName);
+};
+function openAdmin(){
+ const locSel = $("#filterComplaintLoc");
+ if(locSel && locSel.options.length <= 1){
+  Object.values(SP).forEach(p => {
+   const opt = document.createElement("option");
+   opt.value = p.n;
+   opt.textContent = p.n;
+   locSel.appendChild(opt);
+  });
+ }
+ renderAdminTab("overview");
+ $("#adminModal").classList.add("open");
+}
+function renderAdminTab(tabName){
+ updateAdminBadges();
+ if(tabName === "overview"){
+  renderAdminOverview();
+ } else if(tabName === "students"){
+  renderStudentsTable();
+ } else if(tabName === "complaints"){
+  renderComplaintsTable();
+ }
+}
+function updateAdminBadges(){
+ const users = DB.users || [];
+ const reqs = DB.reqs || [];
+ $("#admStudentsCount").textContent = users.length;
+ $("#admComplaintsCount").textContent = reqs.length;
+}
+function renderAdminOverview(){
+ const users = DB.users || [];
+ const reqs = DB.reqs || [];
+ const hostellers = users.filter(u => u.isHosteller).length;
+ const dayScholars = users.length - hostellers;
+ const resolved = reqs.filter(r => r.s === "Resolved").length;
+ const pending = reqs.length - resolved;
+
+ $("#stTotalStudents").textContent = users.length;
+ $("#stHostelVsDay").textContent = `${hostellers} / ${dayScholars}`;
+ $("#stTotalReqs").textContent = reqs.length;
+ $("#stPendingVsRes").textContent = `${pending} / ${resolved}`;
+
+ const recUsers = users.slice(0, 5);
+ const uWrap = $("#admRecentStudents");
+ if(!recUsers.length){
+  uWrap.innerHTML = `<div style="padding:14px;color:var(--mu);text-align:center">No students registered yet.</div>`;
+ } else {
+  uWrap.innerHTML = `<table class="adm-table"><thead><tr><th>Name</th><th>Dept</th><th>Residence</th></tr></thead><tbody>` +
+    recUsers.map(u => `<tr><td><b>${u.name}</b><br><small style="color:var(--mu)">${u.email||u.phone||''}</small></td><td>${u.dept||'N/A'}</td><td>${u.isHosteller ? (u.hostel+' Rm:'+u.room) : 'Day Scholar'}</td></tr>`).join("") +
+    `</tbody></table>`;
+ }
+
+ const recReqs = reqs.slice(0, 5);
+ const cWrap = $("#admRecentComplaints");
+ if(!recReqs.length){
+  cWrap.innerHTML = `<div style="padding:14px;color:var(--mu);text-align:center">No complaints filed yet.</div>`;
+ } else {
+  cWrap.innerHTML = `<table class="adm-table"><thead><tr><th>Facility</th><th>Complaint</th><th>Status</th></tr></thead><tbody>` +
+    recReqs.map(r => `<tr><td><b>${r.location||r.k}</b><br><small style="color:var(--mu)">${r.cat}</small></td><td>${r.m}<br><small style="color:var(--mu)">by ${r.userName||r.by||'Student'}</small></td><td><span class="badge-status ${r.s==="Resolved"?"status-res":r.s==="In progress"?"status-prog":"status-sub"}">${r.s}</span></td></tr>`).join("") +
+    `</tbody></table>`;
+ }
+}
+window.renderStudentsTable = function(){
+ const users = DB.users || [];
+ const q = ($("#searchStudent")?.value || "").toLowerCase().trim();
+ const filter = $("#filterStudentResidence")?.value || "all";
+
+ const filtered = users.filter(u => {
+  if(filter === "hosteller" && !u.isHosteller) return false;
+  if(filter === "day" && u.isHosteller) return false;
+  if(!q) return true;
+  return (u.name||"").toLowerCase().includes(q) ||
+         (u.email||"").toLowerCase().includes(q) ||
+         (u.phone||"").toLowerCase().includes(q) ||
+         (u.dept||"").toLowerCase().includes(q) ||
+         (u.room||"").toLowerCase().includes(q) ||
+         (u.hostel||"").toLowerCase().includes(q);
+ });
+
+ const wrap = $("#studentsTableWrap");
+ if(!filtered.length){
+  wrap.innerHTML = `<div style="padding:24px;text-align:center;color:var(--mu)">No matching students found.</div>`;
+  return;
+ }
+
+ let html = `<table class="adm-table"><thead><tr>
+  <th>#</th><th>Student Name</th><th>Contact Info</th><th>Department & Sem</th><th>Residence</th><th>Registered</th><th>Action</th>
+ </tr></thead><tbody>`;
+
+ filtered.forEach((u, i) => {
+  html += `<tr>
+   <td>${i+1}</td>
+   <td><b>${u.name}</b></td>
+   <td>${u.email||'-'}<br><small style="color:var(--mu)">${u.phone||'-'}</small></td>
+   <td>${u.dept||'N/A'}<br><small style="color:var(--mu)">${u.sem||''}</small></td>
+   <td>${u.isHosteller ? `<span class="chip y" style="font-size:10px">${u.hostel}</span><br><small>Room: ${u.room||'N/A'}</small>` : `<span class="chip a" style="font-size:10px">Day Scholar</span>`}</td>
+   <td><small style="color:var(--mu)">${u.registeredAt || u.savedAt || 'Recent'}</small></td>
+   <td><button class="btn-sm" style="background:#d64545;color:#fff" onclick="deleteAdminStudent('${(u.email||u.phone||u.name).replace(/'/g,"\\'")}')">Delete</button></td>
+  </tr>`;
+ });
+
+ html += `</tbody></table>`;
+ wrap.innerHTML = html;
+};
+window.deleteAdminStudent = function(key){
+ if(!confirm("Are you sure you want to delete this student record?")) return;
+ DB.users = (DB.users||[]).filter(u => (u.email||u.phone||u.name) !== key);
+ save();
+ updateAdminBadges();
+ renderStudentsTable();
+};
+window.renderComplaintsTable = function(){
+ const reqs = DB.reqs || [];
+ const q = ($("#searchComplaint")?.value || "").toLowerCase().trim();
+ const st = $("#filterComplaintStatus")?.value || "all";
+ const loc = $("#filterComplaintLoc")?.value || "all";
+
+ const filtered = reqs.filter(r => {
+  if(st !== "all" && r.s !== st) return false;
+  if(loc !== "all" && (r.location || r.k) !== loc) return false;
+  if(!q) return true;
+  return (r.m||"").toLowerCase().includes(q) ||
+         (r.cat||"").toLowerCase().includes(q) ||
+         (r.userName||r.by||"").toLowerCase().includes(q) ||
+         (r.phone||"").toLowerCase().includes(q) ||
+         (r.location||"").toLowerCase().includes(q);
+ });
+
+ const wrap = $("#complaintsTableWrap");
+ if(!filtered.length){
+  wrap.innerHTML = `<div style="padding:24px;text-align:center;color:var(--mu)">No matching complaints found.</div>`;
+  return;
+ }
+
+ let html = `<table class="adm-table"><thead><tr>
+  <th>Time</th><th>Facility</th><th>Category</th><th>Complaint Details</th><th>Student Info</th><th>Status</th><th>Action</th>
+ </tr></thead><tbody>`;
+
+ filtered.forEach(r => {
+  html += `<tr>
+   <td><small style="color:var(--mu)">${r.time||'Recent'}</small></td>
+   <td><b>${r.location||r.k}</b></td>
+   <td><span class="chip" style="font-size:10px">${r.cat}</span></td>
+   <td style="max-width:280px"><div>${r.m}</div></td>
+   <td><b>${r.userName||r.by||'Student'}</b><br><small style="color:var(--mu)">${r.phone||r.email||''}<br>${r.room||''}</small></td>
+   <td>
+     <select class="btn-sm" style="background:#fff;border:1px solid #ccc;font-weight:700" onchange="updateComplaintStatus(${r.id}, this.value)">
+       <option ${r.s==='Submitted'?'selected':''}>Submitted</option>
+       <option ${r.s==='Assigned'?'selected':''}>Assigned</option>
+       <option ${r.s==='In progress'?'selected':''}>In progress</option>
+       <option ${r.s==='Resolved'?'selected':''}>Resolved</option>
+     </select>
+   </td>
+   <td><button class="btn-sm" style="background:#d64545;color:#fff" onclick="deleteAdminComplaint(${r.id})">&times;</button></td>
+  </tr>`;
+ });
+
+ html += `</tbody></table>`;
+ wrap.innerHTML = html;
+};
+window.updateComplaintStatus = function(id, newStatus){
+ const item = (DB.reqs||[]).find(r => r.id === id);
+ if(item){
+  item.s = newStatus;
+  save();
+  updateAdminBadges();
+  if(cur && P.classList.contains("open")) rl();
+ }
+};
+window.deleteAdminComplaint = function(id){
+ if(!confirm("Are you sure you want to remove this complaint?")) return;
+ DB.reqs = (DB.reqs||[]).filter(r => r.id !== id);
+ save();
+ updateAdminBadges();
+ renderComplaintsTable();
+ if(cur && P.classList.contains("open")) rl();
+};
+window.exportStudentsCSV = function(){
+ const users = DB.users || [];
+ if(!users.length){ alert("No student records to export."); return; }
+ let csv = "Name,Email,Phone,Department,Semester,IsHosteller,Hostel,Room,RegisteredDate\n";
+ users.forEach(u => {
+  csv += `"${(u.name||'').replace(/"/g,'""')}","${u.email||''}","${u.phone||''}","${u.dept||''}","${u.sem||''}","${u.isHosteller?'Yes':'No'}","${u.hostel||''}","${u.room||''}","${u.registeredAt||u.savedAt||''}"\n`;
+ });
+ downloadBlob(csv, "students_records.csv", "text/csv");
+};
+window.exportComplaintsCSV = function(){
+ const reqs = DB.reqs || [];
+ if(!reqs.length){ alert("No complaints to export."); return; }
+ let csv = "ID,Time,Facility,Category,Details,Status,StudentName,Phone,Email,Dept,Residence\n";
+ reqs.forEach(r => {
+  csv += `"${r.id}","${r.time||''}","${r.location||r.k}","${r.cat}","${(r.m||'').replace(/"/g,'""')}","${r.s}","${r.userName||r.by||''}","${r.phone||''}","${r.email||''}","${r.dept||''}","${r.room||''}"\n`;
+ });
+ downloadBlob(csv, "complaints_records.csv", "text/csv");
+};
+window.exportDataJSON = function(){
+ const str = JSON.stringify(DB, null, 2);
+ downloadBlob(str, "campus_database.json", "application/json");
+};
+function downloadBlob(content, filename, type){
+ const blob = new Blob([content], { type: type+";charset=utf-8;" });
+ const link = document.createElement("a");
+ link.href = URL.createObjectURL(blob);
+ link.download = filename;
+ link.click();
+}
+window.seedSampleAdminData = function(){
+ if(!DB.users) DB.users = [];
+ if(!DB.reqs) DB.reqs = [];
+ const samples = [
+  { name: "Aarav Sharma", email: "aarav@kalinga.edu", phone: "9876543210", dept: "Computer Science & IT", sem: "3rd Year (Sem 5 / 6)", isHosteller: true, hostel: "Pacific Hostel", room: "A-204", registeredAt: new Date().toLocaleString() },
+  { name: "Pooja Patel", email: "pooja@kalinga.edu", phone: "9823456789", dept: "Pharmacy & Healthcare", sem: "2nd Year (Sem 3 / 4)", isHosteller: true, hostel: "Indus Hostel", room: "G-102", registeredAt: new Date().toLocaleString() },
+  { name: "Rohit Verma", email: "rohit@kalinga.edu", phone: "9811223344", dept: "Commerce & Management", sem: "1st Year (Sem 1 / 2)", isHosteller: false, hostel: "", room: "", registeredAt: new Date().toLocaleString() }
+ ];
+ samples.forEach(s => {
+  if(!DB.users.some(u => u.email === s.email)) DB.users.push(s);
+ });
+ const sampleReqs = [
+  { id: Date.now()-200000, k: "canteen", location: "Canteen", cat: "Food quality", m: "Lunch meals ran out early at counter 2.", s: "Assigned", by: "Aarav Sharma (CSE Rm:A-204)", userName: "Aarav Sharma", phone: "9876543210", email: "aarav@kalinga.edu", dept: "Computer Science & IT", room: "Pacific Hostel (Rm: A-204)", time: new Date().toLocaleString() },
+  { id: Date.now()-100000, k: "library", location: "Library", cat: "Seat issue", m: "AC on 2nd floor reading hall is not cooling properly.", s: "Submitted", by: "Pooja Patel (Pharmacy Rm:G-102)", userName: "Pooja Patel", phone: "9823456789", email: "pooja@kalinga.edu", dept: "Pharmacy & Healthcare", room: "Indus Hostel (Rm: G-102)", time: new Date().toLocaleString() },
+  { id: Date.now()-50000, k: "boys1", location: "Pacific Hostel", cat: "Electricity / Wi-Fi", m: "Wi-Fi access point in corridor 2 is showing offline.", s: "Resolved", by: "Aarav Sharma (CSE Rm:A-204)", userName: "Aarav Sharma", phone: "9876543210", email: "aarav@kalinga.edu", dept: "Computer Science & IT", room: "Pacific Hostel (Rm: A-204)", time: new Date().toLocaleString() }
+ ];
+ sampleReqs.forEach(sr => {
+  if(!DB.reqs.some(r => r.id === sr.id)) DB.reqs.push(sr);
+ });
+ save();
+ updateAdminBadges();
+ renderAdminTab("overview");
+ alert("Sample data inserted successfully!");
+};
+window.clearAdminComplaints = function(){
+ if(!confirm("Are you sure you want to delete all complaints?")) return;
+ DB.reqs = [];
+ save();
+ updateAdminBadges();
+ renderAdminTab("complaints");
+ if(cur && P.classList.contains("open")) rl();
+};
+window.clearAdminAll = function(){
+ if(!confirm("Are you sure you want to reset all students and complaints? This cannot be undone.")) return;
+ DB.users = [];
+ DB.reqs = [];
+ save();
+ updateAdminBadges();
+ renderAdminTab("overview");
+ if(cur && P.classList.contains("open")) rl();
+};
+/* real Kalinga 360 tour (opens in a window; may be blocked from embedding, so a new-tab link is provided) */
+const TOUR="https://virtualtour.kalingauniversity.ac.in/",EMB="https://panel123.s3.ap-south-1.amazonaws.com/kalingauniv360/index.html";
+let v360=false;
+function setView(on){v360=on;$("#v360").classList.toggle("on",on);$("#cap").style.display=on?"none":"";$("#skip").style.display=on?"none":"";closeP();if(!tb.dataset.t)tb.dataset.t=tb.textContent;tb.textContent=on?"Back to 3D Map":tb.dataset.t;if(on&&!$("#v360").getAttribute("src"))$("#v360").src=EMB}
+window.tour=()=>setView(!v360);
+window.src360=n=>{$("#v360").src=n===1?EMB:TOUR};
+$("#tx").onclick=()=>$("#tm").classList.remove("open");
+addEventListener("keydown",e=>{
+ if(e.key==="Escape"){
+  if(v360) setView(false);
+  closeAdmin();
+  closeAdminAuth();
+ }
+ if((e.ctrlKey || e.metaKey || e.altKey) && e.shiftKey && (e.key === "A" || e.key === "a")){
+  e.preventDefault();
+  triggerAdminAccess();
+ }
+});
+/* helper chat + voice */
+function lev(a,b){if(!a||!b)return(a||b).length;const m=a.length,n=b.length,d=[];for(let i=0;i<=m;i++)d[i]=[i];for(let j=0;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++){for(let j=1;j<=n;j++){d[i][j]=a[i-1]===b[j-1]?d[i-1][j-1]:1+Math.min(d[i-1][j],d[i][j-1],d[i-1][j-1])}}return d[m][n]}
+const KW={
+ reception:/recept|recp|notice|enquir|help desk|id card|\bfee|admission|office/i,
+ library:/libr|libary|lib\b|book|read|seat|journal|study/i,
+ lab:/\blab|equipment|practical|instrument|experiment|slot/i,
+ canteen:/cant|cateen|kante|kanti|mess|food|khana|lunch|dinner|breakfast|eat|snack|meal|menu/i,
+ cafe3:/cafe.*(3|three)/i,
+ cafe2:/cafe.*(2|two)/i,
+ cafe1:/cafe|coffee|chai|tea|juice|snacks?/i,
+ barber:/barb|hair|salon|saloon|haircut|grooming/i,
+ girls:/indus|girls?(\s*hostel)?|ladies/i,
+ boys3:/everest|boys?.*(c|3|three)|hostel.*(c|3|three)/i,
+ boys2:/brahmaputra|boys?.*(b|2|two)|hostel.*(b|2|two)/i,
+ boys1:/pacific|boys?(\s*hostel)?|hostel/i
+};
+const TARGETS={
+ canteen:["canteen","cateen","cantin","kanteen","kantin","mess","food","khana"],
+ reception:["reception","recepton","office","enquiry","admin"],
+ library:["library","libary","librry","books","study"],
+ lab:["lab","laboratory","practical"],
+ barber:["barber","barbar","salon","saloon","haircut"],
+ cafe1:["cafe","coffee","chai","tea"],
+ girls:["girls","hostel","indus"],
+ boys1:["boys","hostel","pacific"]
+};
+const syn=window.speechSynthesis;
+function speak(t){if(!syn)return;syn.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-IN";syn.speak(u)}
+function reply(t){$("#br").textContent=t;speak(t)}
+function ask(q){q=q.trim();if(!q)return;
+ if(/^\/?admin\b/i.test(q)){
+  triggerAdminAccess();
+  reply("Admin access prompt opened.");
+  return;
+ }
+ const matches=Object.entries(KW).map(([key,rx])=>{const m=q.match(rx);return m?{key,score:m[0].length}:null}).filter(Boolean);
+ let key=(matches||[]).sort((a,b)=>b.score-a.score)[0]?.key;
+ if(!key){
+  const words=q.toLowerCase().replace(/[^a-z0-9\s]/g,"").split(/\s+/).filter(w=>w.length>=3);
+  for(const w of words){
+   for(const [k,list] of Object.entries(TARGETS)){
+    if(list.some(t=>lev(w,t)<=2)){key=k;break}
+   }
+   if(key)break;
+  }
+ }
+ if(DB.user && DB.user.isHosteller && /(mera room|mera hostel|my room|my hostel)/i.test(q)){
+  const hMap={"Pacific Hostel":"boys1","Brahmaputra Hostel":"boys2","Everest Hostel":"boys3","Indus Hostel":"girls"};
+  const hKey=hMap[DB.user.hostel]||"boys1";
+  reply("Aapka room "+(DB.user.room?DB.user.room+" ":"")+DB.user.hostel+" mein hai. Chaliye wahan chalte hain!");
+  walk(hKey);
+  return;
+ }
+ if(DB.user && !DB.user.isHosteller && /(mera room|mera hostel|my room|my hostel)/i.test(q)){
+  reply("Aap Day Scholar ke roop mein registered hain. Aapka hostel room campus mein nahi hai.");
+  return;
+ }
+ if(key){const label=SP[key].n;reply("Theek hai, chaliye "+label+" chalte hain!");walk(key);return;}
+ if(/(hello|hi|namaste|hey)/i.test(q)) {
+  const greet = DB.user ? ("Namaste "+DB.user.name+"! ") : "Namaste! ";
+  reply(greet+"Aap kis jagah jaana chahte hain? Jaise canteen, library, reception, hostel, lab, cafe.");
+  return;
+ }
+ reply("Theek hai, kis jagah jaana hai? Jaise Canteen, Library, Reception, Lab ya Hostel.")}
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
+if(SR){rec=new SR();rec.lang="en-IN";rec.onresult=e=>{const t=e.results[0][0].transcript;$("#bi").value="";ask(t)};rec.onend=rec.onerror=()=>$("#bm").classList.remove("rec")}else $("#bm").disabled=true;
+$("#bm").onclick=()=>{if(!rec)return;if(syn)syn.cancel();try{rec.start();$("#bm").classList.add("rec")}catch(e){} };
+const go=()=>{ask($("#bi").value);$("#bi").value=""};$("#bs").onclick=go;$("#bi").addEventListener("keydown",e=>{if(e.key==="Enter")go()});
+/* intro */
+updateUIForUser();
+tick();
+setTimeout(()=>walk("reception"),600);
+if(!DB.user){setTimeout(openAuth,900)}
+</script></body></html>
